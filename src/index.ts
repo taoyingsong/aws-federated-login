@@ -1,4 +1,4 @@
-interface LoginParams {
+export interface LoginParams {
     awsAuthorizedUrl?: string // 自己项目中是可选的
     client_id: string
     identity_provider: string

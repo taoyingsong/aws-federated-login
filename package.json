@@ -2,8 +2,11 @@
   "name": "aws-federated-login",
   "version": "1.1.1",
   "description": "Amazon Federated Login Client",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "clean": "rm -rf ./dist",
+    "build": "npm run clean && npx tsc",
     "test": "echo \"No test specified\""
   },
   "repository": {
@@ -25,5 +28,8 @@
   "devDependencies": {
     "prettier": "2.7.1",
     "typescript": "^4.8.4"
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }
