@@ -1,0 +1,25 @@
+{
+  "name": "aws-federated-login",
+  "version": "1.0.0",
+  "description": "Amazon Federated Login Client",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"No test specified\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/taoyingsong/aws-federated-login.git"
+  },
+  "keywords": [
+    "aws",
+    "login",
+    "federated",
+    "amazon"
+  ],
+  "author": "taoyingsong",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/taoyingsong/aws-federated-login/issues"
+  },
+  "homepage": "https://github.com/taoyingsong/aws-federated-login#readme"
+}
