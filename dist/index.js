@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.awsRedirect = exports.awsFederatedLogin = void 0;
 const windowSize = {
     width: 500,
     height: 549
@@ -11,7 +8,7 @@ const parseObjectToUrlParam = (obj, ignoreFields) => {
         .map((key) => key + '=' + encodeURIComponent(obj[key]))
         .join('&');
 };
-const awsFederatedLogin = (loginParams) => {
+export const awsFederatedLogin = (loginParams) => {
     const { awsAuthorizedUrl, mode, callback } = loginParams;
     const query = parseObjectToUrlParam(loginParams, ['awsAuthorizedUrl', 'mode', 'callback']);
     const href = `${awsAuthorizedUrl}?${query}`;
@@ -30,8 +27,7 @@ const awsFederatedLogin = (loginParams) => {
         }
     }
 };
-exports.awsFederatedLogin = awsFederatedLogin;
-const awsRedirect = (redirectURL = 'http://localhost:3000') => {
+export const awsRedirect = (redirectURL = 'http://localhost:3000') => {
     const search = location.search.substring(1);
     const searchObj = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}');
     if (window.opener) {
@@ -42,4 +38,3 @@ const awsRedirect = (redirectURL = 'http://localhost:3000') => {
         window.location.href = redirectURL;
     }
 };
-exports.awsRedirect = awsRedirect;
