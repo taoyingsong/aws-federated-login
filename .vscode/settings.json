@@ -1,0 +1,10 @@
+{
+    "git.mergeEditor": false,
+    "editor.formatOnPaste": true, // 告诉 VSCode 在粘贴时格式化文件
+    "editor.formatOnSave": true, // 告诉 VSCode 在保存时格式化文件
+    "editor.defaultFormatter": "esbenp.prettier-vscode", // 告诉 VSCode 使用 Prettier 作为默认文件格式化程序
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true,
+        "source.fixAll.format": true
+    }
+}
