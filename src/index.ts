@@ -1,5 +1,5 @@
 interface LoginParams {
-  awsAuthorizedUrl?: string // 自己项目中是可选的
+  awsAuthorizedUrl: string
   client_id: string
   identity_provider: string
   redirect_uri: string
