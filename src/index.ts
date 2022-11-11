@@ -16,7 +16,7 @@ const windowSize = {
 
 const parseObjectToUrlParam = (obj: Record<string, any>, ignoreFields: string[]): string => {
   return Object.keys(obj)
-    .filter((key) => ignoreFields.includes(key) === false)
+    .filter((key) => ignoreFields.indexOf(key) === -1)
     .map((key) => key + '=' + encodeURIComponent(obj[key]))
     .join('&')
 }
