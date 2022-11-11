@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.awsRedirect = exports.awsFederatedLogin = void 0;
 var windowSize = {
     width: 600,
     height: 678
@@ -9,7 +12,7 @@ var parseObjectToUrlParam = function (obj, ignoreFields) {
         .join('&');
 };
 var code = '';
-export var awsFederatedLogin = function (loginParams) {
+var awsFederatedLogin = function (loginParams) {
     var awsAuthorizedUrl = loginParams.awsAuthorizedUrl, mode = loginParams.mode, callback = loginParams.callback;
     var query = parseObjectToUrlParam(loginParams, ['awsAuthorizedUrl', 'mode', 'callback']);
     var href = "".concat(awsAuthorizedUrl, "?").concat(query);
@@ -33,7 +36,8 @@ export var awsFederatedLogin = function (loginParams) {
         }
     }
 };
-export var awsRedirect = function (redirectURL) {
+exports.awsFederatedLogin = awsFederatedLogin;
+var awsRedirect = function (redirectURL) {
     if (redirectURL === void 0) { redirectURL = 'http://localhost:3000'; }
     var search = location.search.substring(1);
     var searchObj = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}');
@@ -45,3 +49,4 @@ export var awsRedirect = function (redirectURL) {
         window.location.href = redirectURL;
     }
 };
+exports.awsRedirect = awsRedirect;
