@@ -1,6 +1,6 @@
 {
   "name": "aws-federated-login",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "Amazon Federated Login Client",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
