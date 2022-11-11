@@ -10,8 +10,8 @@ interface LoginParams {
 }
 
 const windowSize = {
-  width: 500,
-  height: 549
+  width: 600,
+  height: 678
 }
 
 const parseObjectToUrlParam = (obj: Record<string, any>, ignoreFields: string[]): string => {
@@ -21,6 +21,7 @@ const parseObjectToUrlParam = (obj: Record<string, any>, ignoreFields: string[])
     .join('&')
 }
 
+let code = ''
 export const awsFederatedLogin = (loginParams: LoginParams) => {
   const { awsAuthorizedUrl, mode, callback } = loginParams
   const query = parseObjectToUrlParam(loginParams, ['awsAuthorizedUrl', 'mode', 'callback'])
@@ -32,7 +33,11 @@ export const awsFederatedLogin = (loginParams: LoginParams) => {
       // ,location=yes,scrollbars=yes,status=yes
       window.open(href, 'sub', `width=${windowSize.width},height=${windowSize.height},left=${left},top=${top}`)
       window.addEventListener('message', (event) => {
-        callback && callback(event.data)
+        const newCode = event.data?.code
+        if (newCode && newCode !== code && callback) {
+          code = newCode
+          callback(event.data)
+        }
       })
     } else {
       window.location.href = href
