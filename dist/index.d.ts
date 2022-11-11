@@ -1,5 +1,5 @@
 interface LoginParams {
-    awsAuthorizedUrl?: string;
+    awsAuthorizedUrl: string;
     client_id: string;
     identity_provider: string;
     redirect_uri: string;
