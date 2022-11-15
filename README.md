@@ -28,7 +28,7 @@ interface LoginParams {
     response_type: string;
     scope: string;
     mode?: 'popup' | 'redirect'; // default 'redirect'
-    callback?: (params: any) => void;
+    callback: (params: any) => void;
 }
 export declare const awsFederatedLogin: (loginParams: LoginParams) => void;
 ```
@@ -38,8 +38,7 @@ export declare const awsFederatedLogin: (loginParams: LoginParams) => void;
 popup middle page send message to the callback function that triggers the popup function
 
 ```js
-// redirectURL default: 'http://localhost:3000'
-export declare const awsRedirect: (redirectURL?: string) => void;
+export declare const awsRedirect: () => void;
 ```
 
 # Demo
