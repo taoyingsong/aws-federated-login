@@ -11,7 +11,6 @@ var parseObjectToUrlParam = function (obj, ignoreFields) {
         .map(function (key) { return key + '=' + encodeURIComponent(obj[key]); })
         .join('&');
 };
-var code = '';
 var awsFederatedLogin = function (loginParams) {
     var awsAuthorizedUrl = loginParams.awsAuthorizedUrl, mode = loginParams.mode, callback = loginParams.callback;
     var query = parseObjectToUrlParam(loginParams, ['awsAuthorizedUrl', 'mode', 'callback']);
@@ -22,31 +21,28 @@ var awsFederatedLogin = function (loginParams) {
             var top_1 = window.screen.height / 2 - windowSize.height / 2;
             // ,location=yes,scrollbars=yes,status=yes
             window.open(href, 'sub', "width=".concat(windowSize.width, ",height=").concat(windowSize.height, ",left=").concat(left, ",top=").concat(top_1));
-            window.addEventListener('message', function (event) {
-                var _a;
-                var newCode = (_a = event.data) === null || _a === void 0 ? void 0 : _a.code;
-                if (newCode && newCode !== code && callback) {
-                    code = newCode;
-                    callback(event.data);
-                }
-            });
         }
         else {
-            window.location.href = href;
+            window.open(href, '_blank');
         }
+        window.addEventListener('message', function (event) {
+            var _a;
+            var newCode = (_a = event.data) === null || _a === void 0 ? void 0 : _a.code;
+            if (newCode && newCode !== sessionStorage.getItem('code') && callback) {
+                sessionStorage.setItem('code', newCode);
+                callback(event.data);
+            }
+        });
     }
 };
 exports.awsFederatedLogin = awsFederatedLogin;
-var awsRedirect = function (redirectURL) {
-    if (redirectURL === void 0) { redirectURL = 'http://localhost:3000'; }
+var awsRedirect = function () {
+    // const _redirectURL = (location.hostname === 'localhost' ? 'http://' : 'https://') + location.host
     var search = location.search.substring(1);
     var searchObj = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}');
-    if (window.opener) {
+    if (window === null || window === void 0 ? void 0 : window.opener) {
         window.opener.postMessage(searchObj, '*');
         window.close();
-    }
-    else {
-        window.location.href = redirectURL;
     }
 };
 exports.awsRedirect = awsRedirect;

@@ -6,7 +6,7 @@ interface LoginParams {
   response_type: string
   scope: string
   mode?: 'popup' | 'redirect' // 默认 'redirect'
-  callback?: (params: any) => void
+  callback: (params: any) => void
 }
 
 const windowSize = {
