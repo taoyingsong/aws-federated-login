@@ -21,7 +21,6 @@ const parseObjectToUrlParam = (obj: Record<string, any>, ignoreFields: string[])
     .join('&')
 }
 
-let code = ''
 export const awsFederatedLogin = (loginParams: LoginParams) => {
   const { awsAuthorizedUrl, mode, callback } = loginParams
   const query = parseObjectToUrlParam(loginParams, ['awsAuthorizedUrl', 'mode', 'callback'])
@@ -32,28 +31,27 @@ export const awsFederatedLogin = (loginParams: LoginParams) => {
       const top = window.screen.height / 2 - windowSize.height / 2
       // ,location=yes,scrollbars=yes,status=yes
       window.open(href, 'sub', `width=${windowSize.width},height=${windowSize.height},left=${left},top=${top}`)
-      window.addEventListener('message', (event) => {
-        const newCode = event.data?.code
-        if (newCode && newCode !== code && callback) {
-          code = newCode
-          callback(event.data)
-        }
-      })
     } else {
-      window.location.href = href
+      window.open(href, '_blank')
     }
+    window.addEventListener('message', (event) => {
+      const newCode = event.data?.code
+      if (newCode && newCode !== sessionStorage.getItem('code') && callback) {
+        sessionStorage.setItem('code', newCode)
+        callback(event.data)
+      }
+    })
   }
 }
 
-export const awsRedirect = (redirectURL = 'http://localhost:3000') => {
+export const awsRedirect = () => {
+  // const _redirectURL = (location.hostname === 'localhost' ? 'http://' : 'https://') + location.host
   const search = location.search.substring(1)
   const searchObj = JSON.parse(
     '{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}'
   )
-  if (window.opener) {
+  if (window?.opener) {
     window.opener.postMessage(searchObj, '*')
     window.close()
-  } else {
-    window.location.href = redirectURL
   }
 }
