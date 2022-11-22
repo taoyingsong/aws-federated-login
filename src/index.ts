@@ -6,7 +6,7 @@ interface LoginParams {
   response_type: string
   scope: string
   mode?: 'popup' | 'redirect' // 默认 'redirect'
-  callback: (params: any) => void
+  callback: (params: any, identity_provider: string) => void
 }
 
 const windowSize = {
@@ -38,7 +38,7 @@ export const awsFederatedLogin = (loginParams: LoginParams) => {
       const newCode = event.data?.code
       if (newCode && newCode !== sessionStorage.getItem('code') && callback) {
         sessionStorage.setItem('code', newCode)
-        callback(event.data)
+        callback(event.data, loginParams.identity_provider || '')
       }
     })
   }

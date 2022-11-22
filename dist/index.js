@@ -30,7 +30,7 @@ var awsFederatedLogin = function (loginParams) {
             var newCode = (_a = event.data) === null || _a === void 0 ? void 0 : _a.code;
             if (newCode && newCode !== sessionStorage.getItem('code') && callback) {
                 sessionStorage.setItem('code', newCode);
-                callback(event.data);
+                callback(event.data, loginParams.identity_provider || '');
             }
         });
     }
