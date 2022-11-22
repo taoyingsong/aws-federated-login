@@ -6,7 +6,7 @@ interface LoginParams {
   response_type: string
   scope: string
   mode?: 'popup' | 'redirect' // 默认 'redirect'
-  callback: (params: any, identity_provider: string) => void
+  callback: (params: any) => void
 }
 
 const windowSize = {
@@ -34,13 +34,16 @@ export const awsFederatedLogin = (loginParams: LoginParams) => {
     } else {
       window.open(href, '_blank')
     }
-    window.addEventListener('message', (event) => {
+    const _fn = (event: { data: { code: any } }) => {
       const newCode = event.data?.code
       if (newCode && newCode !== sessionStorage.getItem('code') && callback) {
         sessionStorage.setItem('code', newCode)
-        callback(event.data, loginParams.identity_provider || '')
+        callback(event.data)
+        window.removeEventListener('message', _fn, false)
       }
-    })
+    }
+    window.removeEventListener('message', _fn, false)
+    window.addEventListener('message', _fn)
   }
 }
 

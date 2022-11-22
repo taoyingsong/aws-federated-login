@@ -25,14 +25,17 @@ var awsFederatedLogin = function (loginParams) {
         else {
             window.open(href, '_blank');
         }
-        window.addEventListener('message', function (event) {
+        var _fn_1 = function (event) {
             var _a;
             var newCode = (_a = event.data) === null || _a === void 0 ? void 0 : _a.code;
             if (newCode && newCode !== sessionStorage.getItem('code') && callback) {
                 sessionStorage.setItem('code', newCode);
-                callback(event.data, loginParams.identity_provider || '');
+                callback(event.data);
+                window.removeEventListener('message', _fn_1, false);
             }
-        });
+        };
+        window.removeEventListener('message', _fn_1, false);
+        window.addEventListener('message', _fn_1);
     }
 };
 exports.awsFederatedLogin = awsFederatedLogin;
