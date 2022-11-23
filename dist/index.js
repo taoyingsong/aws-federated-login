@@ -11,11 +11,52 @@ var parseObjectToUrlParam = function (obj, ignoreFields) {
         .map(function (key) { return key + '=' + encodeURIComponent(obj[key]); })
         .join('&');
 };
+var _eventHandlers = {};
+var addListener = function (node, event, handler, capture) {
+    if (capture === void 0) { capture = false; }
+    if (Object.keys(_eventHandlers).indexOf(event) === -1) {
+        _eventHandlers[event] = [];
+    }
+    // here we track the events and their nodes (note that we cannot
+    // use node as Object keys, as they'd get coerced into a string
+    _eventHandlers[event].push({ node: node, handler: handler, capture: capture });
+    node.addEventListener(event, handler, capture);
+};
+var removeAllListeners = function (targetNode, event) {
+    var _eventArr = _eventHandlers[event];
+    if (_eventArr && _eventArr.length > 0) {
+        // remove listeners from the matching nodes
+        _eventArr
+            .filter(function (_a) {
+            var node = _a.node;
+            return node === targetNode;
+        })
+            .forEach(function (_a) {
+            var node = _a.node, handler = _a.handler, capture = _a.capture;
+            return node.removeEventListener(event, handler, capture);
+        });
+        // update _eventHandlers global
+        _eventHandlers[event] = _eventArr.filter(function (_a) {
+            var node = _a.node;
+            return node !== targetNode;
+        });
+    }
+};
 var awsFederatedLogin = function (loginParams) {
     var awsAuthorizedUrl = loginParams.awsAuthorizedUrl, mode = loginParams.mode, callback = loginParams.callback;
     var query = parseObjectToUrlParam(loginParams, ['awsAuthorizedUrl', 'mode', 'callback']);
     var href = "".concat(awsAuthorizedUrl, "?").concat(query);
+    var _fn = function (event) {
+        var _a;
+        var newCode = (_a = event.data) === null || _a === void 0 ? void 0 : _a.code;
+        if (newCode && newCode !== sessionStorage.getItem('code') && callback) {
+            sessionStorage.setItem('code', newCode);
+            callback(event.data);
+            window.removeEventListener('message', _fn, false);
+        }
+    };
     if (typeof window !== 'undefined') {
+        removeAllListeners(window, 'message');
         if (mode === 'popup') {
             var left = window.screen.width / 2 - windowSize.width / 2;
             var top_1 = window.screen.height / 2 - windowSize.height / 2;
@@ -25,17 +66,7 @@ var awsFederatedLogin = function (loginParams) {
         else {
             window.open(href, '_blank');
         }
-        var _fn_1 = function (event) {
-            var _a;
-            var newCode = (_a = event.data) === null || _a === void 0 ? void 0 : _a.code;
-            if (newCode && newCode !== sessionStorage.getItem('code') && callback) {
-                sessionStorage.setItem('code', newCode);
-                callback(event.data);
-                window.removeEventListener('message', _fn_1, false);
-            }
-        };
-        window.removeEventListener('message', _fn_1, false);
-        window.addEventListener('message', _fn_1);
+        addListener(window, 'message', _fn);
     }
 };
 exports.awsFederatedLogin = awsFederatedLogin;

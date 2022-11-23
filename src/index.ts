@@ -9,6 +9,12 @@ interface LoginParams {
   callback: (params: any) => void
 }
 
+interface EventElement {
+  node: Window
+  handler: any
+  capture: boolean
+}
+
 const windowSize = {
   width: 600,
   height: 678
@@ -21,11 +27,47 @@ const parseObjectToUrlParam = (obj: Record<string, any>, ignoreFields: string[])
     .join('&')
 }
 
+const _eventHandlers: Record<string, EventElement[]> = {}
+const addListener = (node: Window, event: string, handler: any, capture = false) => {
+  if (Object.keys(_eventHandlers).indexOf(event) === -1) {
+    _eventHandlers[event] = []
+  }
+
+  // here we track the events and their nodes (note that we cannot
+  // use node as Object keys, as they'd get coerced into a string
+  _eventHandlers[event].push({ node, handler, capture })
+  node.addEventListener(event, handler, capture)
+}
+
+const removeAllListeners = (targetNode: Window, event: string) => {
+  const _eventArr = _eventHandlers[event]
+  if (_eventArr && _eventArr.length > 0) {
+    // remove listeners from the matching nodes
+    _eventArr
+      .filter(({ node }) => node === targetNode)
+      .forEach(({ node, handler, capture }) => node.removeEventListener(event, handler, capture))
+
+    // update _eventHandlers global
+    _eventHandlers[event] = _eventArr.filter(({ node }) => node !== targetNode)
+  }
+}
+
 export const awsFederatedLogin = (loginParams: LoginParams) => {
   const { awsAuthorizedUrl, mode, callback } = loginParams
   const query = parseObjectToUrlParam(loginParams, ['awsAuthorizedUrl', 'mode', 'callback'])
   const href = `${awsAuthorizedUrl}?${query}`
+
+  const _fn = (event: { data: { code: any } }) => {
+    const newCode = event.data?.code
+    if (newCode && newCode !== sessionStorage.getItem('code') && callback) {
+      sessionStorage.setItem('code', newCode)
+      callback(event.data)
+      window.removeEventListener('message', _fn, false)
+    }
+  }
+
   if (typeof window !== 'undefined') {
+    removeAllListeners(window, 'message')
     if (mode === 'popup') {
       const left = window.screen.width / 2 - windowSize.width / 2
       const top = window.screen.height / 2 - windowSize.height / 2
@@ -34,16 +76,7 @@ export const awsFederatedLogin = (loginParams: LoginParams) => {
     } else {
       window.open(href, '_blank')
     }
-    const _fn = (event: { data: { code: any } }) => {
-      const newCode = event.data?.code
-      if (newCode && newCode !== sessionStorage.getItem('code') && callback) {
-        sessionStorage.setItem('code', newCode)
-        callback(event.data)
-        window.removeEventListener('message', _fn, false)
-      }
-    }
-    window.removeEventListener('message', _fn, false)
-    window.addEventListener('message', _fn)
+    addListener(window, 'message', _fn)
   }
 }
 
